@@ -46,3 +46,6 @@ nbdist/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+# 前端项目单独维护，不纳入后端仓库
+/xhzb_ui/
