@@ -19,8 +19,8 @@ server:
 # 日志配置
 logging:
   level:
-    com.xhzb: debug
-    org.springframework: warn
+    com.xhzb: warn
+    org.springframework: debug
 
 # Spring配置
 spring:
@@ -44,7 +44,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.100.168:3306/xhzb?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
     username: root
-    password: heima123
+    password: ${VMMYSQL_PASSWORD}
   # redis 配置
   data:
     redis:
@@ -77,6 +77,6 @@ springdoc:
 # oss的配置，要根据自己实际情况来进行修改
 oss:
   endpoint: oss-cn-beijing.aliyuncs.com
-  accessKeyId: ${OSS_ACCESS_KEY_ID}
-  accessKeySecret: ${OSS_ACCESS_KEY_SECRET}
-  bucketName: itcastwu
+  accessKeyId: ${BUCKET_ACCESSKEY_ID}
+  accessKeySecret: ${BUCKET_ACCESSKEY_SECRET}
+  bucketName: nowibecomedeath

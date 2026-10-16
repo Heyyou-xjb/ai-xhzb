@@ -17,6 +17,28 @@ ruoyi:
 spring:
   profiles:
     active: dev
+  ai:
+    openai:
+      api-key: ${DEEPSEEK_API_KEY}  #读取环境变量中的api key
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: qwen2.5:0.5b
+      embedding:
+        options:
+          model: qwen3-embedding:0.6b
+          dimensions: 1024
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY}  #读取环境变量中的api key
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
 
 # 用户配置
 user:

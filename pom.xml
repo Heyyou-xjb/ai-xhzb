@@ -68,6 +68,14 @@
                 <version>${pagehelper.boot.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>1.1.8</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- jsqlparser (MyBatis-Plus 3.5.x 需要 4.x 版本) -->
             <dependency>
                 <groupId>com.github.jsqlparser</groupId>

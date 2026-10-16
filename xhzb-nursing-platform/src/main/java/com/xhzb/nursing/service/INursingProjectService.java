@@ -66,4 +66,12 @@ public interface INursingProjectService extends IService<NursingProject>
      * @return
      */
     List<NursingProjectVo> listAll();
+
+    /**
+     * 查询所有已启用的护理项目（含名称、单位、价格、护理要求等完整信息）
+     * 供智能客服大模型检索数据库内容使用
+     *
+     * @return 已启用的护理项目集合
+     */
+    List<NursingProject> listEnabledProjects();
 }

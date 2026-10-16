@@ -17,6 +17,28 @@
 CREATE DATABASE IF NOT EXISTS `xhzb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_eo_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `xhzb`;
 
+-- 导出  表 xhzb.ai_chat_message 结构
+CREATE TABLE IF NOT EXISTS `ai_chat_message` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `chat_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '会话ID',
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息角色 USER：用户提问 ASSISTANT：AI回复 SYSTEM：系统提示',
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '消息内容',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_chat_id` (`chat_id`,`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='AI会话消息表';
+
+-- 导出  表 xhzb.ai_chat_session 结构
+CREATE TABLE IF NOT EXISTS `ai_chat_session` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint NOT NULL COMMENT '用户ID（sys_user.user_id）',
+  `chat_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '会话ID',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_user_chat` (`user_id`,`chat_id`) USING BTREE,
+  KEY `idx_user_create_time` (`user_id`,`create_time`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='AI会话表';
+
 -- 导出  表 xhzb.alert_data 结构
 CREATE TABLE IF NOT EXISTS `alert_data` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',

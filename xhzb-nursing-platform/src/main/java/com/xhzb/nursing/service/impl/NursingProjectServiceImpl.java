@@ -128,4 +128,18 @@ public class NursingProjectServiceImpl extends ServiceImpl<NursingProjectMapper,
     public List<NursingProjectVo> listAll() {
         return nursingProjectMapper.listAll();
     }
+
+    /**
+     * 查询所有已启用的护理项目（含名称、单位、价格、护理要求等完整信息）
+     * 供智能客服大模型检索数据库内容使用
+     *
+     * @return 已启用的护理项目集合
+     */
+    @Override
+    public List<NursingProject> listEnabledProjects() {
+        //只查询启用状态（status=1）的护理项目，按排序号升序展示
+        return list(Wrappers.<NursingProject>lambdaQuery()
+                .eq(NursingProject::getStatus, 1)
+                .orderByAsc(NursingProject::getOrderNo));
+    }
 }
