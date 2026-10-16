@@ -89,7 +89,6 @@ public class SpringAIConfig {
                 .defaultSystem(SYSTEM_PROMPT)
                 .build();
     }
-    //省略其他代码......
 
     @Bean
     public VectorStore redisVectorStore(OllamaEmbeddingModel ollamaEmbeddingModel) {

@@ -6,12 +6,11 @@ import com.xhzb.common.exception.base.BaseException;
 import com.xhzb.common.utils.SecurityUtils;
 import com.xhzb.nursing.domain.vo.MessageVO;
 import com.xhzb.nursing.service.ChatHistoryService;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
+import com.xhzb.nursing.service.IAiChatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -24,19 +23,14 @@ import static com.xhzb.common.core.domain.AjaxResult.success;
 @RequestMapping("/ai")
 public class ChatController {
 
-    /**
-     * 智能客服会话客户端：必须使用带会话记忆(MessageChatMemoryAdvisor)和知识库RAG(QuestionAnswerAdvisor)的
-     * deepseekChatClient，这里用@Qualifier显式指定，避免与同名的简易Bean混淆。
-     */
     @Autowired
-    @Qualifier("deepseekChatClient")
-    private ChatClient chatClient;
+    private IAiChatService aiChatService;
 
     @Autowired
     private ChatHistoryService chatHistoryService;
 
     /**
-     * 智能问答接口：以流式（SSE）方式返回 DeepSeek 回答，支持多轮会话记忆与知识库 RAG。
+     * 智能问答接口：以流式方式返回 DeepSeek 回答，支持多轮会话记忆与知识库 RAG。
      *
      * @param prompt 用户本次提问内容
      * @param chatId 会话唯一标识，用于关联会话记忆与历史记录
@@ -50,14 +44,30 @@ public class ChatController {
             throw new BaseException("请先新建会话");
         }
 
-        // 保存当前用户与会话的交互历史记录
-        chatHistoryService.saveHistory(SecurityUtils.getUserId().toString(), chatId);
+        String userId = SecurityUtils.getUserId().toString();
 
-        return chatClient.prompt()
-                .user(prompt)
-                .advisors(x-> x.param(ChatMemory.CONVERSATION_ID,chatId)) //每次对话时传递唯一对话ID
-                .stream()// 持续输出效果
-                .content();
+        // 保存当前用户与会话的交互历史记录
+        chatHistoryService.saveHistory(userId, chatId);
+
+        return aiChatService.streamChat(userId, chatId, prompt);
+    }
+
+    /**
+     * 打断接口：停止正在进行的流式输出
+     * 只结束模型的输出，已经生成的内容不会清除，并会补存到会话记录中
+     *
+     * @param chatId 会话唯一标识
+     * @return 是否打断了一个正在进行的流式对话
+     */
+    @PostMapping("/chat/stop")
+    public AjaxResult stopChat(String chatId) {
+
+        // 未携带会话 ID 时无法定位要打断的对话
+        if(StrUtil.isBlank(chatId)) {
+            throw new BaseException("会话ID不能为空");
+        }
+
+        return success(aiChatService.stopStream(SecurityUtils.getUserId().toString(), chatId));
     }
 
     /**

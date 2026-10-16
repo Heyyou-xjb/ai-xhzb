@@ -91,6 +91,37 @@ public class AiChatMessageServiceImpl extends ServiceImpl<AiChatMessageMapper, A
     }
 
     /**
+     * 保存被打断的AI回复（已生成的内容）
+     * 会话记忆顾问只在流正常结束时保存AI回复，打断场景需要在此补存；
+     * 若已存在相同内容的AI回复，则不再重复入库
+     *
+     * @param chatId 会话ID
+     * @param content 已生成的回复内容
+     */
+    @Override
+    public void saveInterruptedReply(String chatId, String content) {
+        if (StrUtil.isBlank(chatId) || StrUtil.isBlank(content)) {
+            return;
+        }
+
+        //判重：打断与模型自然结束几乎同时发生时，避免同一条回复重复入库
+        Long existCount = count(Wrappers.<AiChatMessage>lambdaQuery()
+                .eq(AiChatMessage::getChatId, chatId)
+                .eq(AiChatMessage::getRole, MessageType.ASSISTANT.name())
+                .eq(AiChatMessage::getContent, content));
+        if (existCount != null && existCount > 0) {
+            return;
+        }
+
+        AiChatMessage messageEntity = new AiChatMessage();
+        messageEntity.setChatId(chatId);
+        messageEntity.setRole(MessageType.ASSISTANT.name());
+        messageEntity.setContent(content);
+        messageEntity.setCreateTime(new Date());
+        save(messageEntity);
+    }
+
+    /**
      * 判断消息是否需要落库：只保留用户提问、AI回复、系统提示，且内容不能为空
      */
     private boolean isPersistableMessage(Message message) {

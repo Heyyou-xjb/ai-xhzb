@@ -37,4 +37,14 @@ public interface IAiChatMessageService extends IService<AiChatMessage>
      * @param chatId 会话ID
      */
     void deleteMessagesByChatId(String chatId);
+
+    /**
+     * 保存被打断的AI回复（已生成的内容）
+     * 会话记忆顾问只在流正常结束时保存AI回复，打断场景需要在此补存；
+     * 若已存在相同内容的AI回复（例如停止请求与模型自然结束几乎同时发生），则不再重复入库
+     *
+     * @param chatId 会话ID
+     * @param content 已生成的回复内容
+     */
+    void saveInterruptedReply(String chatId, String content);
 }

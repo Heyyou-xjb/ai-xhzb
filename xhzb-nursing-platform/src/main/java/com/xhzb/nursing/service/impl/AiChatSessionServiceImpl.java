@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 /**
  * AI会话Service业务层处理
  *
- * @author ruoyi
+ * @author xujingbo
  * @date 2026-10-15
  */
 @Service

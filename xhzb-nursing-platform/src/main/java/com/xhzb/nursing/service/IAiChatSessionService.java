@@ -8,7 +8,7 @@ import com.xhzb.nursing.domain.AiChatSession;
 /**
  * AI会话Service接口
  *
- * @author ruoyi
+ * @author xujingbo
  * @date 2026-10-15
  */
 public interface IAiChatSessionService extends IService<AiChatSession>
