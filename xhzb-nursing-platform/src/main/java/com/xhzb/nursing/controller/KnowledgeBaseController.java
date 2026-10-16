@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 知识库Controller
  *
- * @author ruoyi
+ * @author xujingbo
  * @date 2026-10-15
  */
 @RestController
