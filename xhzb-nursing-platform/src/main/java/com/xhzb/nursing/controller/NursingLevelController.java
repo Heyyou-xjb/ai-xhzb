@@ -97,4 +97,15 @@ public class NursingLevelController extends BaseController
     {
         return toAjax(nursingLevelService.deleteNursingLevelByIds(ids));
     }
+
+    /**
+     * 查询所有启用的护理等级（入住办理下拉使用）
+     *
+     * @return 启用的护理等级集合
+     */
+    @GetMapping("/listAll")
+    @Operation(summary = "查询所有启用的护理等级")
+    public AjaxResult listAll() {
+        return success(nursingLevelService.listAllEnabled());
+    }
 }

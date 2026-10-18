@@ -175,4 +175,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <resultMap id="roomInfoResult" type="com.xhzb.nursing.domain.vo.checkin.RoomInfoVo">
+        <result property="floorName" column="floor_name"/>
+        <result property="floorId" column="floor_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="code" column="code"/>
+        <result property="price" column="price"/>
+    </resultMap>
+
+    <!-- 入住办理：房间详情，房间表的 type_name 与房型表的 name 关联取房型价格 -->
+    <select id="selectRoomInfoById" resultMap="roomInfoResult">
+        select f.name as floor_name,
+               r.floor_id as floor_id,
+               r.id as room_id,
+               r.code as code,
+               rt.price as price
+        from room r
+        left join floor f on f.id = r.floor_id
+        left join room_type rt on rt.name = r.type_name
+        where r.id = #{id}
+    </select>
 </mapper>

@@ -20,8 +20,10 @@ import com.xhzb.nursing.domain.HealthAssessmentDataCollection;
 import com.xhzb.nursing.domain.HealthAssessmentReport;
 import com.xhzb.nursing.domain.RoomType;
 import com.xhzb.nursing.domain.dto.health.ElderAssessmentDto;
+import com.xhzb.nursing.domain.dto.health.BasicInfo;
 import com.xhzb.nursing.domain.vo.ElderLevelResultVO;
 import com.xhzb.nursing.domain.vo.HealthReportResultVO;
+import com.xhzb.nursing.domain.vo.checkin.CheckInElderBasicVo;
 import com.xhzb.nursing.mapper.HealthAssessmentMapper;
 import com.xhzb.nursing.service.IHealthAssessmentDataCollectionService;
 import com.xhzb.nursing.service.IHealthAssessmentReportService;
@@ -202,7 +204,7 @@ public class HealthAssessmentServiceImpl extends ServiceImpl<HealthAssessmentMap
                 fall, choking, suicideAttempt, lost, coma,
                 dementia, mentalIllness, knownCognitiveImpairment);
 
-        // 3.2 调用大模型，3.3 解析出JSON结果（初始能力等级、最终能力等级、等级变化原因）
+        // 3.2 调用大模型，解析出JSON结果（初始能力等级、最终能力等级、等级变化原因）
         ElderLevelResultVO levelResult = chatBigModel(userPrompt1, ElderLevelResultVO.class);
         validateLevelResult(levelResult);
         String initialAbilityLevel = normalizeAbilityLevel(levelResult.getPreLevel());
@@ -216,11 +218,13 @@ public class HealthAssessmentServiceImpl extends ServiceImpl<HealthAssessmentMap
                 .last("limit 1")
                 .one();
         HealthAssessmentReport report = existReport == null ? new HealthAssessmentReport() : existReport;
+
         if (existReport == null) {
             report.setHealthAssessmentId(assessmentId);
             report.setCreateBy(SecurityUtils.getUserId().toString());
             report.setCreateTime(DateUtils.getNowDate());
         }
+
         report.setAssessmentTime(LocalDateTime.now());
         report.setAssessorName(SecurityUtils.getUsername());
         report.setDailyActivityLevel(dailyActivityLevel);
@@ -310,6 +314,48 @@ public class HealthAssessmentServiceImpl extends ServiceImpl<HealthAssessmentMap
                 .orderByDesc(HealthAssessmentReport::getId)
                 .last("limit 1")
                 .one();
+    }
+
+    /**
+     * 根据评估ID获取老人基本信息（入住办理时回填）
+     * 基本信息来自评估数据采集表的 basic_info 字段，核心建议来自评估记录
+     *
+     * @param assessmentId 健康评估ID
+     * @return 老人基本信息
+     */
+    @Override
+    public CheckInElderBasicVo getElderBasicInfo(Long assessmentId) {
+        HealthAssessmentDataCollection collection = healthAssessmentDataCollectionService.getById(assessmentId);
+        if (collection == null || StrUtil.isBlank(collection.getBasicInfo())) {
+            throw new ServiceException("该评估记录没有老人基本信息");
+        }
+
+        //评估数据采集表以JSON保存基本信息，解析后按入住办理需要的字段返回
+        BasicInfo basicInfo;
+        try {
+            basicInfo = JSONUtil.toBean(collection.getBasicInfo(), BasicInfo.class);
+        } catch (Exception e) {
+            log.error("解析评估基本信息失败，assessmentId={}", assessmentId, e);
+            throw new ServiceException("评估基本信息解析失败");
+        }
+
+        CheckInElderBasicVo elderBasicVo = new CheckInElderBasicVo();
+        elderBasicVo.setName(basicInfo.getElderName());
+        elderBasicVo.setIdCardNo(basicInfo.getIdCard());
+        elderBasicVo.setPhone(basicInfo.getElderContact());
+        elderBasicVo.setNation(basicInfo.getNation());
+        elderBasicVo.setEducationLevel(basicInfo.getEducationLevel());
+        elderBasicVo.setSocialSecurityCard(basicInfo.getSocialSecurityCard());
+        elderBasicVo.setLivingSituation(basicInfo.getLivingSituation());
+        elderBasicVo.setReligiousBelief(basicInfo.getReligiousBelief());
+        elderBasicVo.setEconomicSource(basicInfo.getEconomicSource());
+        elderBasicVo.setMaritalStatus(basicInfo.getMaritalStatus());
+        elderBasicVo.setMedicalPaymentMethod(basicInfo.getMedicalPaymentMethod());
+
+        //核心建议取评估记录中的判断结果：0-不建议入住，1-建议入住
+        HealthAssessment healthAssessment = getById(assessmentId);
+        elderBasicVo.setCoreSuggestion(healthAssessment == null ? null : healthAssessment.getCoreSuggestion());
+        return elderBasicVo;
     }
 
     /**
@@ -795,7 +841,8 @@ public class HealthAssessmentServiceImpl extends ServiceImpl<HealthAssessmentMap
      */
     private String buildInstitutionPreparation(String finalAbilityLevel) {
         return switch (finalAbilityLevel) {
-            case "重度失能" -> "配置护理床、防压疮垫与移位辅具；安排24小时专人照护；房间去除门槛并加装扶手；建立翻身与皮肤护理计划";
+            case "重度失能" ->
+                    "配置护理床、防压疮垫与移位辅具；安排24小时专人照护；房间去除门槛并加装扶手；建立翻身与皮肤护理计划";
             case "中度失能" -> "配置助行器与防滑设施；安排定时巡护；房间加装夜灯与扶手；建立跌倒与噎食应急预案";
             case "轻度失能" -> "房间加装防滑垫与扶手；提供助行辅具；安排每日健康巡查";
             default -> "按普通入住标准准备房间与生活用品；建立健康档案并定期体检";

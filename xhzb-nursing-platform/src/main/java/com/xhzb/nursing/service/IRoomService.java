@@ -3,6 +3,7 @@ package com.xhzb.nursing.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xhzb.nursing.domain.Room;
 import com.xhzb.nursing.domain.vo.RoomVo;
+import com.xhzb.nursing.domain.vo.checkin.RoomInfoVo;
 
 import java.util.List;
 
@@ -67,5 +68,13 @@ public interface IRoomService extends IService<Room>
      * @return
      */
     List<RoomVo> getRoomsWithNurByFloorId(Long floorId);
+
+    /**
+     * 根据房间ID查询房间信息（楼层、房间编号与房型价格）
+     *
+     * @param id 房间ID
+     * @return 房间信息
+     */
+    RoomInfoVo selectRoomInfoById(Long id);
 
 }

@@ -96,4 +96,16 @@ public class FloorController extends BaseController
         List<Floor> list = floorService.selectAllByNur();
         return R.ok(list);
     }
+
+    /**
+     * 根据床位状态查询楼层、房间、床位树形数据（入住办理选择床位使用）
+     *
+     * @param status 床位状态：0-未入住，1-已入住
+     * @return 楼层-房间-床位树形数据
+     */
+    @GetMapping("/getRoomAndBedByBedStatus/{status}")
+    @Operation(summary = "根据床位状态查询楼层房间床位", description = "status：0-未入住，1-已入住")
+    public AjaxResult getRoomAndBedByBedStatus(@PathVariable Integer status) {
+        return success(floorService.getRoomAndBedByBedStatus(status));
+    }
 }

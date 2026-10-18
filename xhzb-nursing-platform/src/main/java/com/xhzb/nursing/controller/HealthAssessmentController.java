@@ -126,4 +126,16 @@ public class HealthAssessmentController extends BaseController {
     public AjaxResult getAssessmentDetail(@PathVariable Long id) {
         return success(healthAssessmentService.getAssessmentDetail(id));
     }
+
+    /**
+     * 查看老人信息详情（入住办理时根据评估ID回填老人基本信息）
+     *
+     * @param id 评估ID
+     * @return 老人基本信息
+     */
+    @GetMapping("/elder/{id}")
+    @Operation(summary = "查看老人信息详情(入住字段填充)")
+    public AjaxResult getElderInfo(@Schema(name = "评估ID", requiredMode = Schema.RequiredMode.REQUIRED) @PathVariable Long id) {
+        return success(healthAssessmentService.getElderBasicInfo(id));
+    }
 }

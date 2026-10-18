@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xhzb.nursing.domain.HealthAssessmentDataCollection;
 import com.xhzb.nursing.domain.HealthAssessmentReport;
 import com.xhzb.nursing.domain.dto.health.ElderAssessmentDto;
+import com.xhzb.nursing.domain.vo.checkin.CheckInElderBasicVo;
 
 /**
  * 健康评估记录Service接口
@@ -84,4 +85,12 @@ public interface IHealthAssessmentService extends IService<HealthAssessment> {
      * @return
      */
     HealthAssessmentReport getAssessmentDetail(Long id);
+
+    /**
+     * 根据评估ID获取老人基本信息（入住办理时回填）
+     *
+     * @param assessmentId 健康评估ID
+     * @return 老人基本信息
+     */
+    CheckInElderBasicVo getElderBasicInfo(Long assessmentId);
 }
