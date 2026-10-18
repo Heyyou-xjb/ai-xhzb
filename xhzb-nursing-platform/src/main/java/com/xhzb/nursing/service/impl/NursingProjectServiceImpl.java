@@ -2,6 +2,7 @@ package com.xhzb.nursing.service.impl;
 
 import java.util.List;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xhzb.common.exception.ServiceException;
 import com.xhzb.common.exception.base.BaseException;
@@ -141,5 +142,40 @@ public class NursingProjectServiceImpl extends ServiceImpl<NursingProjectMapper,
         return list(Wrappers.<NursingProject>lambdaQuery()
                 .eq(NursingProject::getStatus, 1)
                 .orderByAsc(NursingProject::getOrderNo));
+    }
+
+    /**
+     * 小程序服务页：按名称与状态分页查询护理项目
+     * 名称支持模糊匹配，结果按排序号升序展示；分页由Controller中的startPage完成
+     *
+     * @param query 查询条件（name：名称模糊匹配，status：状态）
+     * @return 护理项目集合
+     */
+    @Override
+    public List<NursingProject> listForMember(NursingProject query) {
+        NursingProject condition = query == null ? new NursingProject() : query;
+        return list(Wrappers.<NursingProject>lambdaQuery()
+                .like(StrUtil.isNotBlank(condition.getName()), NursingProject::getName, condition.getName())
+                .eq(condition.getStatus() != null, NursingProject::getStatus, condition.getStatus())
+                .orderByAsc(NursingProject::getOrderNo)
+                .orderByAsc(NursingProject::getId));
+    }
+
+    /**
+     * 小程序服务页：根据编号查询护理项目详情
+     *
+     * @param id 护理项目主键
+     * @return 护理项目详情
+     */
+    @Override
+    public NursingProject getMemberProjectDetail(Long id) {
+        if (id == null) {
+            throw new ServiceException("服务项目编号不能为空");
+        }
+        NursingProject nursingProject = getById(id);
+        if (nursingProject == null) {
+            throw new ServiceException("服务项目不存在");
+        }
+        return nursingProject;
     }
 }

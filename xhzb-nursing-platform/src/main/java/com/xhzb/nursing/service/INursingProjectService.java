@@ -74,4 +74,20 @@ public interface INursingProjectService extends IService<NursingProject>
      * @return 已启用的护理项目集合
      */
     List<NursingProject> listEnabledProjects();
+
+    /**
+     * 小程序服务页：按名称与状态分页查询护理项目
+     *
+     * @param query 查询条件（name：名称模糊匹配，status：状态）
+     * @return 护理项目集合
+     */
+    List<NursingProject> listForMember(NursingProject query);
+
+    /**
+     * 小程序服务页：根据编号查询护理项目详情
+     *
+     * @param id 护理项目主键
+     * @return 护理项目详情
+     */
+    NursingProject getMemberProjectDetail(Long id);
 }
