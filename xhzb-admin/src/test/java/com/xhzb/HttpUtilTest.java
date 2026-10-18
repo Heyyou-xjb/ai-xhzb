@@ -77,4 +77,23 @@ public class HttpUtilTest {
     }
 
 
+    /**
+     * 测试调用第三方接口查询天气
+     */
+    @Test
+    public void testQueryWeather() {
+
+        String url = "https://ali-weather.showapi.com/hour24";
+
+        HttpResponse response = HttpUtil.createGet(url)
+                .header("Authorization", "APPCODE 918f99e9fe8e49d7ace8c85e26d7d31b")
+                .form("area", "郑州")
+                .execute();
+
+        if (response.isOk()) {
+            String result = response.body();
+
+            System.out.println(result);
+        }
+    }
 }
