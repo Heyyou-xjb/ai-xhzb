@@ -89,4 +89,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <resultMap id="floorBedRowResult" type="com.xhzb.nursing.domain.vo.checkin.FloorBedRowVo">
+        <result property="floorId" column="floor_id"/>
+        <result property="floorName" column="floor_name"/>
+        <result property="roomId" column="room_id"/>
+        <result property="roomCode" column="room_code"/>
+        <result property="bedId" column="bed_id"/>
+        <result property="bedNumber" column="bed_number"/>
+    </resultMap>
+
+    <!-- 入住办理：按床位状态查询楼层、房间、床位（三表关联） -->
+    <select id="selectFloorBedRows" resultMap="floorBedRowResult">
+        select f.id as floor_id,
+               f.name as floor_name,
+               r.id as room_id,
+               r.code as room_code,
+               b.id as bed_id,
+               b.bed_number as bed_number
+        from floor f
+        inner join room r on r.floor_id = f.id and ifnull(r.is_deleted, 0) = 0
+        inner join bed b on b.room_id = r.id
+        where b.bed_status = #{bedStatus}
+        order by f.code, f.id, r.sort, r.code, b.sort, b.id
+    </select>
 </mapper>

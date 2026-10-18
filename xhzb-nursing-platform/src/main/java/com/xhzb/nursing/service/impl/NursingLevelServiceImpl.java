@@ -1,6 +1,7 @@
 package com.xhzb.nursing.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xhzb.nursing.domain.NursingLevel;
 import com.xhzb.nursing.domain.vo.NursingLevelVo;
 import com.xhzb.nursing.mapper.NursingLevelMapper;
@@ -92,6 +93,19 @@ public class NursingLevelServiceImpl extends ServiceImpl<NursingLevelMapper,Nurs
     public int deleteNursingLevelById(Long id)
     {
         return nursingLevelMapper.deleteNursingLevelById(id);
+    }
+
+    /**
+     * 查询所有启用的护理等级（入住办理下拉使用）
+     *
+     * @return 启用的护理等级集合
+     */
+    @Override
+    public List<NursingLevel> listAllEnabled() {
+        //只查询启用状态（status=1）的护理等级，按主键升序展示
+        return list(Wrappers.<NursingLevel>lambdaQuery()
+                .eq(NursingLevel::getStatus, 1)
+                .orderByAsc(NursingLevel::getId));
     }
 
 }

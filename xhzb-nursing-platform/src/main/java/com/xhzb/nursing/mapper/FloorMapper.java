@@ -3,7 +3,9 @@ package com.xhzb.nursing.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xhzb.nursing.domain.Floor;
 import com.xhzb.nursing.domain.vo.FloorVo;
+import com.xhzb.nursing.domain.vo.checkin.FloorBedRowVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -65,4 +67,12 @@ public interface FloorMapper extends BaseMapper<Floor>
     public int deleteFloorByIds(Long[] ids);
 
     List<Floor> selectAllByNur();
+
+    /**
+     * 根据床位状态查询 楼层-房间-床位 关联数据（状态：0-未入住，1-已入住）
+     *
+     * @param bedStatus 床位状态
+     * @return 关联数据集合
+     */
+    List<FloorBedRowVo> selectFloorBedRows(@Param("bedStatus") Integer bedStatus);
 }

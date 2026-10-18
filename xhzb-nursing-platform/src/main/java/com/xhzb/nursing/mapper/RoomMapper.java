@@ -3,6 +3,8 @@ package com.xhzb.nursing.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xhzb.nursing.domain.Room;
 import com.xhzb.nursing.domain.vo.RoomVo;
+import com.xhzb.nursing.domain.vo.checkin.RoomInfoVo;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -67,5 +69,13 @@ public interface RoomMapper extends BaseMapper<Room>
     List<RoomVo> selectByFloorId(Long floorId);
 
     List<RoomVo> selectByFloorIdWithNur(Long floorId);
+
+    /**
+     * 根据房间ID查询房间信息（关联楼层、房型，room.type_name = room_type.name）
+     *
+     * @param id 房间ID
+     * @return 房间信息
+     */
+    RoomInfoVo selectRoomInfoById(@Param("id") Long id);
 
 }

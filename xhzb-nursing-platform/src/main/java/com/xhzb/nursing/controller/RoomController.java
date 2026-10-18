@@ -106,4 +106,16 @@ public class RoomController extends BaseController
         return toAjax(roomService.deleteRoomByIds(ids));
     }
 
+    /**
+     * 查询房间数据（楼层、房间、价格），入住办理选择床位后回填使用
+     *
+     * @param id 房间ID
+     * @return 房间信息
+     */
+    @GetMapping("/one/{id}")
+    @Operation(summary = "查询房间数据（楼层、房间、价格）")
+    public AjaxResult getRoomInfo(@Schema(name = "房间ID", requiredMode = Schema.RequiredMode.REQUIRED) @PathVariable Long id) {
+        return success(roomService.selectRoomInfoById(id));
+    }
+
 }

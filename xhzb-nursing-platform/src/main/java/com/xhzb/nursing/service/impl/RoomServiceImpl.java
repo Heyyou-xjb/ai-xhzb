@@ -8,6 +8,8 @@ import com.xhzb.nursing.domain.Room;
 import com.xhzb.nursing.mapper.RoomMapper;
 import com.xhzb.nursing.service.IRoomService;
 import com.xhzb.nursing.domain.vo.RoomVo;
+import com.xhzb.nursing.domain.vo.checkin.RoomInfoVo;
+import com.xhzb.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -102,6 +104,21 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements IR
     @Override
     public List<RoomVo> getRoomsWithNurByFloorId(Long floorId) {
         return roomMapper.selectByFloorIdWithNur(floorId);
+    }
+
+    /**
+     * 根据房间ID查询房间信息（楼层、房间编号与房型价格）
+     *
+     * @param id 房间ID
+     * @return 房间信息
+     */
+    @Override
+    public RoomInfoVo selectRoomInfoById(Long id) {
+        RoomInfoVo roomInfo = roomMapper.selectRoomInfoById(id);
+        if (roomInfo == null) {
+            throw new ServiceException("房间不存在");
+        }
+        return roomInfo;
     }
 
 }
