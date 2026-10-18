@@ -90,3 +90,11 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+# 微信小程序配置（家属端小程序登录使用）
+wechat:
+  mini-program:
+    # 小程序AppID
+    appid: wx0c7e54065109139c
+    # 小程序AppSecret
+    secret: 063471ed332066ac71566afc8adabc9e
